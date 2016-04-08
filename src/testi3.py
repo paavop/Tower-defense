@@ -49,31 +49,23 @@ screen.fill((200,191,231))
 
 pygame.display.flip()
 
-print("   00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 ")
 for i in range(12):
-    print (str(i).zfill(2),end=" ")
     for j in range(20):
         if isinstance(peli.board.get_spot(i, j),Tower):
-            print("T  ", end="")
             screen.blit(torni,(50*j,50*i))
             continue
         if isinstance(peli.board.get_spot(i, j),Road):
             if(peli.board.get_spot(i, j).start):
-                print("S  ", end="")
                 screen.blit(tie_start,(50*j,50*i))
                 continue
             if(peli.board.get_spot(i, j).goal):
-                print("G  ", end="")
                 screen.blit(tie_goal,(50*j,50*i))
                 continue
             
-            print("R  ", end="")
             screen.blit(tie,(50*j,50*i))
             continue
         if isinstance(peli.board.get_spot(i, j),Spot):
-            print("   ", end="") 
             screen.blit(maa,(50*j,50*i))
-    print("")
     
     
 pygame.display.flip()
@@ -81,8 +73,35 @@ pygame.display.flip()
 running=True
 
 while running:
+    
+    a=(pygame.mouse.get_pos())
+    if pygame.mouse.get_pressed()==(1,0,0):
+        peli.board.add_tower(int(a[1]/50), int(a[0]/50))
+    if pygame.mouse.get_pressed()==(0,0,1):
+        peli.board.remove_tower(int(a[1]/50), int(a[0]/50))
+    
     for event in pygame.event.get():
             # only do something if the event is of type QUIT
             if event.type == pygame.QUIT:
                 # change the value to False, to exit the main loop
                 running = False
+                
+                
+    for i in range(12):
+        for j in range(20):
+            if isinstance(peli.board.get_spot(i, j),Tower):
+                screen.blit(torni,(50*j,50*i))
+                continue
+            if isinstance(peli.board.get_spot(i, j),Road):
+                if(peli.board.get_spot(i, j).start):
+                    screen.blit(tie_start,(50*j,50*i))
+                    continue
+                if(peli.board.get_spot(i, j).goal):
+                    screen.blit(tie_goal,(50*j,50*i))
+                    continue
+                screen.blit(tie,(50*j,50*i))
+                continue
+            if isinstance(peli.board.get_spot(i, j),Spot):
+                screen.blit(maa,(50*j,50*i))
+                     
+    pygame.display.flip()

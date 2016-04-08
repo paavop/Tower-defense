@@ -27,6 +27,12 @@ class Board(object):
                 print("Can't build on another tower")
         else:
             print("Can't build on road")
+            
+    def remove_tower(self,x,y):
+        if  (isinstance(self.board[x,y],Tower)):
+            self.board[x,y]=Spot()
+        else:
+            print("You can only remove towers")
         
     def add_road(self,x,y):
         self.board[x,y]=Road()
