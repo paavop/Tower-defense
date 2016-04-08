@@ -1,6 +1,6 @@
 # import the pygame module, so you can use it
 import pygame
-import Game
+import game
 # define a main function
 def main():
     

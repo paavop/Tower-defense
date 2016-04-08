@@ -14,13 +14,16 @@ class Road(Spot):
     def __init__(self):
         self.next=None
         self.start=False
-        self.goal=False
+        self.goal=True
         
     def def_start(self):
         self.start=True
         
     def def_goal(self):
         self.goal=True
+    
+    def def_next(self,road):
+        self.next=road
         
     def __str__(self):
         return "road"
