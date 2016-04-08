@@ -3,16 +3,16 @@ Created on 9.3.2016
 
 @author: Paavo
 '''
-import spot
+from spot import Spot
 
-class road(spot):
+class Road(Spot):
     '''
     classdocs
     '''
 
 
-    def __init__(self, params):
-        self.next
+    def __init__(self):
+        self.next=None
         self.start=False
         self.goal=False
         
@@ -21,6 +21,9 @@ class road(spot):
         
     def def_goal(self):
         self.goal=True
+        
+    def __str__(self):
+        return "road"
         
     
         
