@@ -19,23 +19,25 @@ class Board(object):
                 
         self.lastroad=None
             
-    def add_tower(self,x,y):
+    def add_tower(self,x,y,price,power,range):
         if not (isinstance(self.board[x,y],Road)):
             if not (isinstance(self.board[x,y],Tower)):
-                self.board[x,y]=Tower()
+                self.board[x,y]=Tower(price,power,range)
+                return("Tower built")
             else:
-                print("Can't build on another tower")
+                return("Can't build on another tower")
         else:
-            print("Can't build on road")
+            return("Can't build on road")
             
     def remove_tower(self,x,y):
         if  (isinstance(self.board[x,y],Tower)):
             self.board[x,y]=Spot()
+            return("Tower removed")
         else:
-            print("You can only remove towers")
+            return("You can only remove towers")
         
     def add_road(self,x,y):
-        self.board[x,y]=Road()
+        self.board[x,y]=Road(x,y)
         if self.lastroad==None:
             self.board[x,y].def_start()
         if self.lastroad:

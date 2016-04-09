@@ -11,7 +11,9 @@ class Road(Spot):
     '''
 
 
-    def __init__(self):
+    def __init__(self,x,y):
+        self.x=x
+        self.y=y
         self.next=None
         self.start=False
         self.goal=True
@@ -24,6 +26,8 @@ class Road(Spot):
     
     def def_next(self,road):
         self.next=road
+    def get_next(self):
+        return self.next
         
     def __str__(self):
         return "road"

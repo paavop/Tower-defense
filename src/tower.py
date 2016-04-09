@@ -11,8 +11,10 @@ class Tower(Spot):
     '''
 
 
-    def __init__(self):
-        self.value=0;
+    def __init__(self,price,power,range):
+        self.price=price
+        self.power=power
+        self.range=range
         
     def __str__(self):
         return "tower"
