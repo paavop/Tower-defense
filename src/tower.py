@@ -25,7 +25,27 @@ class Tower(Spot):
     def __str__(self):
         return "tower"
         
-
+    def shot_x(self,time):
+        x=0
+        xd=0
+        if(time/1000-self.lastshot<0.5 and self.target!=None):
+            if (self.target.spot.x>self.target.spot.next.x):
+                xd=self.target.get_frame()/50
+            if (self.target.spot.x<self.target.spot.next.x):
+                xd=-self.target.get_frame()/50
+            x=-50*(self.x-self.target.spot.x+xd)*((time/1000-self.lastshot)/0.5)            
+        return int(x)
+    
+    def shot_y(self,time):
+        y=0
+        yd=0
+        if(time/1000-self.lastshot<0.5 and self.target!=None):
+            if (self.target.spot.y>self.target.spot.next.y):
+                yd=self.target.get_frame()/50
+            if (self.target.spot.y<self.target.spot.next.y):
+                yd=-self.target.get_frame()/50
+            y=-50*(self.y-self.target.spot.y+yd)*((time/1000-self.lastshot)/0.5)            
+        return int(y)
     
                     
     def distance(self,enemy):
@@ -38,27 +58,27 @@ class Tower(Spot):
         if (self.target!=None):
             if(enemies[self.target.get_index()]!=None):
                 if(self.distance(enemies[self.target.get_index()])<=self.myrange):
-                    self.mytarget=enemies[self.target.get_index()]
-                    self.mytarget.shot(self.power)
+                    self.target=enemies[self.target.get_index()]
+                    self.target.shot(self.power)
                     self.lastshot=time
                     return
                 else:
                     for i in enemies:
                         if (enemies[i]!=None and self.distance(enemies[i])<=self.myrange):
-                            self.mytarget=enemies[i]
-                            self.mytarget.shot(self.power)
+                            self.target=enemies[i]
+                            self.target.shot(self.power)
                             self.lastshot=time
             else:
                 for i in enemies:
                     if (enemies[i]!=None and self.distance(enemies[i])<=self.myrange):
-                        self.mytarget=enemies[i]
-                        self.mytarget.shot(self.power)
+                        self.target=enemies[i]
+                        self.target.shot(self.power)
                         self.lastshot=time
         else:
             for i in enemies:
                 if (enemies[i]!=None and self.distance(enemies[i])<=self.myrange):
-                    self.mytarget=enemies[i]
-                    self.mytarget.shot(self.power)
+                    self.target=enemies[i]
+                    self.target.shot(self.power)
                     self.lastshot=time
 
         

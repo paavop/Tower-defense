@@ -23,9 +23,6 @@ done=False
 def update_screen():
     for i in range(12):
         for j in range(20):
-            if isinstance(peli.board.get_spot(i, j),Tower):
-                screen.blit(torni,(50*j,50*i))
-                continue
             if isinstance(peli.board.get_spot(i, j),Road):
                 if(peli.board.get_spot(i, j).start):
                     screen.blit(tie_start,(50*j,50*i))
@@ -38,6 +35,12 @@ def update_screen():
                 continue
             if isinstance(peli.board.get_spot(i, j),Spot):
                 screen.blit(maa,(50*j,50*i))
+    for i in range(12):
+        for j in range(20):
+            if isinstance(peli.board.get_spot(i, j),Tower):
+                draw_tower(peli.board.get_spot(i,j),50*j,50*i)
+                continue
+            
     pygame.draw.lines(screen, (1,0,0), False,[(0,600),(998,600),(998,698),(0,698),(0,600)],4)
     print_text()
     for i in range(enemycount):
@@ -60,7 +63,15 @@ def draw_lose_screen():
     s.set_alpha(128)
     s.fill((176,0,0))
     screen.blit(s,(0,0))
-        
+
+def draw_tower(tower,x,y):
+    ya=tower.shot_y(pygame.time.get_ticks())
+    xa=tower.shot_x(pygame.time.get_ticks())
+    screen.blit(torni,(x,y))
+    if(ya!=0 or xa!=0):
+        pygame.draw.circle(screen,(1,0,0),(x+25+ya,y+25+xa),7,0)
+    
+    
 def draw_enemy(enemy):
     kuva=None
     ya=0
@@ -80,10 +91,11 @@ def draw_enemy(enemy):
             ya=enemy.get_frame()
         screen.blit(kuva,(ya+enemy.spot.y*50,xa+enemy.spot.x*50))
         draw_enemy_hp(enemy,ya,xa)
-        print(str(ya+enemy.spot.y*50)+"   "+str(xa+enemy.spot.x*50))         
+        #print(str(int(ya+enemy.spot.y*50))+"   "+str(int(xa+enemy.spot.x*50)))         
         enemy.add_frame(50*((pygame.time.get_ticks()/1000)-enemy.get_lastmove())/enemy.get_timetonext(),pygame.time.get_ticks()/1000)
         
     else:
+        
         screen.blit(kuva,(enemy.spot.y*50,enemy.spot.x*50))
         pygame.display.flip()
         return True
@@ -209,7 +221,7 @@ screen.fill(color)
 
 
 
-spawn_enemy("vihu", 1000, 4,start)
+spawn_enemy("vihu", 10, 1,start)
 
 
     
@@ -222,7 +234,7 @@ while running:
     a=(pygame.mouse.get_pos())
     if pygame.mouse.get_pressed()==(1,0,0):
         if(a[1]<=600):
-            add_tower(a, 100, 100, 5, 2)
+            add_tower(a, 100, 1, 20, 2)
             #new_text(peli.board.add_tower(int(a[1]/50), int(a[0]/50),100,5,5))
     if pygame.mouse.get_pressed()==(0,0,1):
         if(a[1]<=600):
