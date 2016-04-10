@@ -11,10 +11,14 @@ teksti3=""
 color=(200,191,231)
 start=None
 enemies={}
+towers={}
 enemycount=0
+towercount=0
 time=0
 prev_time=0
 peli=Game()
+pygame.init()
+done=False
 
 def update_screen():
     for i in range(12):
@@ -38,25 +42,62 @@ def update_screen():
     print_text()
     for i in range(enemycount):
         if enemies[i]!=None:
-            draw_enemy(enemies[i])
+            if(draw_enemy(enemies[i])):
+                pygame.time.wait(500)
+                new_text("You lose")
+                draw_lose_screen()
+                font=pygame.font.Font(None, 200)
+                text=font.render(teksti1,1,(10,10,10))
+                screen.blit(text,(250,250))
+                pygame.display.flip()
+                pygame.time.wait(2000)
+                pygame.quit()
     print_time()
     pygame.display.flip()
     
-def draw_enemy(enemy):
-    if not (enemy.spot.goal):
+def draw_lose_screen():
+    s=pygame.Surface((1000,600))
+    s.set_alpha(128)
+    s.fill((176,0,0))
+    screen.blit(s,(0,0))
         
+def draw_enemy(enemy):
+    kuva=None
+    ya=0
+    xa=0
+    if not (enemy.spot.goal):
         if (enemy.spot.x>enemy.spot.next.x):
             kuva=bugu
+            xa=-enemy.get_frame()
         if (enemy.spot.x<enemy.spot.next.x):
             kuva=bugd
+            xa=enemy.get_frame()
         if (enemy.spot.y>enemy.spot.next.y):
             kuva=bugl
+            ya=-enemy.get_frame()
         if (enemy.spot.y<enemy.spot.next.y):
             kuva=bugr
-        screen.blit(kuva,(enemy.spot.y*50,enemy.spot.x*50))
+            ya=enemy.get_frame()
+        screen.blit(kuva,(ya+enemy.spot.y*50,xa+enemy.spot.x*50))
+        draw_enemy_hp(enemy,ya,xa)
+        print(str(ya+enemy.spot.y*50)+"   "+str(xa+enemy.spot.x*50))         
+        enemy.add_frame(50*((pygame.time.get_ticks()/1000)-enemy.get_lastmove())/enemy.get_timetonext(),pygame.time.get_ticks()/1000)
+        
     else:
-        print("You lose")
-        running=False
+        screen.blit(kuva,(enemy.spot.y*50,enemy.spot.x*50))
+        pygame.display.flip()
+        return True
+    
+def draw_enemy_hp(enemy,ya,xa):
+    percentage=enemy.get_relative_hp()
+    green=40*percentage
+    red=40-green
+    if(green>0):
+        pygame.draw.rect(screen,(0,200,0),(ya+enemy.spot.y*50+5,xa+enemy.spot.x*50+5,green,5),0)
+    if(red>0 and red<=40):
+        pygame.draw.rect(screen,(200,0,0),(ya+enemy.spot.y*50+5+green,xa+enemy.spot.x*50+5,red,5),0)
+
+    
 def new_text(teksti):
     if (teksti!=None):
         global teksti1
@@ -65,7 +106,9 @@ def new_text(teksti):
         teksti3=teksti2
         teksti2=teksti1
         teksti1=teksti
-    
+
+
+               
 def print_text():
     
     pygame.draw.rect(screen,(200,191,200),(10,610,200,80),0)
@@ -95,13 +138,32 @@ def make_road():
     for i in range(7):
         peli.board.add_road(5, 13+i)
     
-def spawn_enemy(name,speed,hp,start):
+def spawn_enemy(name,hp,speed,start):
     global enemycount
     
-    enemies[enemycount]=Enemy(name,speed,hp,start)
+    enemies[enemycount]=Enemy(name,hp,speed,start,enemycount)
     
     enemycount=enemycount+1
     
+def add_tower(a,price,power,myrange,speed):
+    global towercount
+    if not (isinstance(peli.board.get_spot(int(a[1]/50),int(a[0]/50)),Road)):
+        if not (isinstance(peli.board.get_spot(int(a[1]/50),int(a[0]/50)),Tower)):
+            new_text(peli.board.add_tower(int(a[1]/50), int(a[0]/50),price,power,myrange,towercount,speed))
+            towers[towercount]=peli.board.get_spot(int(a[1]/50), int(a[0]/50))
+            towercount+=1
+    
+    
+    
+def remove_tower(a):
+    global towercount
+    if  (isinstance(peli.board.get_spot(int(a[1]/50), int(a[0]/50)),Tower)):
+        del towers[peli.board.get_spot(int(a[1]/50),int(a[0]/50)).get_index()]
+    new_text(peli.board.remove_tower(int(a[1]/50), int(a[0]/50)))
+    
+    
+    
+          
 def print_time():
     pygame.draw.rect(screen,color,(850,610,125,80),0)
     teksti="Time: "+str(int(time))
@@ -109,9 +171,14 @@ def print_time():
     text=font.render(teksti,1,(10,10,10))
     screen.blit(text,(850,610))
     
+def shoot_towers():
+    for i in towers:
+        if ((pygame.time.get_ticks()/1000)-towers[i].lastshot>(2/towers[i].speed)):
+            towers[i].shoot(enemies,pygame.time.get_ticks()/1000)
+            
 make_road()
 
-pygame.init()
+
 clock=pygame.time.Clock()
     
 logo = pygame.image.load("logo32x32.png")
@@ -142,9 +209,9 @@ screen.fill(color)
 
 
 
-spawn_enemy("vihu", 5, 100,start)
+spawn_enemy("vihu", 1000, 4,start)
 
-enemies[0].move()
+
     
 pygame.display.flip()
 
@@ -155,10 +222,12 @@ while running:
     a=(pygame.mouse.get_pos())
     if pygame.mouse.get_pressed()==(1,0,0):
         if(a[1]<=600):
-            new_text(peli.board.add_tower(int(a[1]/50), int(a[0]/50),100,5,5))
+            add_tower(a, 100, 100, 5, 2)
+            #new_text(peli.board.add_tower(int(a[1]/50), int(a[0]/50),100,5,5))
     if pygame.mouse.get_pressed()==(0,0,1):
         if(a[1]<=600):
-            new_text(peli.board.remove_tower(int(a[1]/50), int(a[0]/50)))
+            remove_tower(a)
+            
     
     for event in pygame.event.get():
             # only do something if the event is of type QUIT
@@ -168,11 +237,27 @@ while running:
                 
     if running:      
         update_screen()
-    clock.tick(30)
+    #clock.tick(30)
     time=pygame.time.get_ticks()/1000
-    if(int(time)>prev_time):
-        enemies[0].move()
-        prev_time+=1
-    pygame.display.flip()
+    
+    #if(time>5 and not done):
+        #done=True
+        #spawn_enemy("name", 100, 4, start)
+        
+    shoot_towers()
+    for i in enemies:
+        if (enemies[i]!=None):
+            if(enemies[i].is_alive()):
+                if(time>prev_time+enemies[i].get_timetonext()):
+                    
+
+                    enemies[i].move()
+                    #enemies[i].shot(10)
+                    
+                    enemies[i].framezero()
+                    prev_time+=enemies[i].get_timetonext()
+            else:
+                enemies[i]=None
+    
     
     
