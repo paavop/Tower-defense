@@ -14,13 +14,26 @@ class Enemy(object):
         self.timetonext=5/speed
         self.lastmove=0
         self.index=index
+        self.shott=0
+        self.shot_time=0
+        self.hplost=False
+        self.prev_time=0
+        self.steps_taken=0
+        self.price=(self.orig_hp+5*self.speed)/10
         
-    def move(self):
-        next=self.spot.get_next()
-        self.spot=next
+    def move(self,prev):
+        mynext=self.spot.get_next()
+        self.spot=mynext
+        self.framezero()
+        self.prev_time=prev
+        self.steps_taken+=1
+        #print(self.name+" moved")
     
-    def shot(self,hplost):
-        self.hp=self.hp-hplost
+    def shot(self,hplost,time):
+        if self.shott==0:
+            self.shot_time=time
+        self.shott+=hplost
+        
         
         
     def is_alive(self):
@@ -30,7 +43,14 @@ class Enemy(object):
             return False
     def get_speed(self):
         return self.speed
-    
+    def gotshot(self,time,totarget):
+        if(-(self.shot_time-time/1000)>=totarget and self.shot_time>0 and self.shott>0):
+            self.hp-=self.shott
+            self.hplost=True
+            self.shott=0
+            self.shot_time=0
+            return True
+        return False
     def get_frame(self):
         return self.anim_frame
     

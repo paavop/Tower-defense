@@ -19,10 +19,10 @@ class Board(object):
                 
         self.lastroad=None
             
-    def add_tower(self,x,y,price,power,range,index,speed):
+    def add_tower(self,x,y,price,power,myrange,index,speed,money):
         if not (isinstance(self.board[x,y],Road)):
             if not (isinstance(self.board[x,y],Tower)):
-                self.board[x,y]=Tower(price,power,range,x,y,index,speed)
+                self.board[x,y]=Tower(price,power,myrange,x,y,index,speed)
                 return("Tower built")
             else:
                 return("Can't build on another tower")
