@@ -11,7 +11,8 @@ class Tower(Spot):
     '''
 
 
-    def __init__(self,price,power,myrange,x,y,index,speed):
+    def __init__(self,price,power,myrange,x,y,index,speed,pic,name):
+        self.name=name
         self.price=price
         self.power=power
         self.myrange=myrange
@@ -24,9 +25,11 @@ class Tower(Spot):
         self.lastangle=0
         if (self.speed>=5):
             self.timetotarget=(2/self.speed)
+        elif (self.speed==1):
+            self.timetotarget=(0.2)
         else:
             self.timetotarget=0.4
-        
+        self.pic=pic
         
     def __str__(self):
         return "tower"

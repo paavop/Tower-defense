@@ -30,9 +30,36 @@ firstx=350
 firsty=600
 space=(100-2*buttony-8)/3
 name1="Cannon"
-name2="Adv. cannon"
+name2="Gatling gun"
 name3="Super cannon"
 name4="Sniper"
+build=False
+build1=False
+build2=False
+build3=False
+build4=False
+
+ranges={}
+ranges[1]=2
+ranges[2]=3
+ranges[3]=4
+ranges[4]=8
+speeds={}
+speeds[1]=3
+speeds[2]=15
+speeds[3]=5
+speeds[4]=1
+powers={}
+powers[1]=5
+powers[2]=10
+powers[3]=15
+powers[4]=20
+prices={}
+prices[1]=100
+prices[2]=150
+prices[3]=200
+prices[4]=300
+
 def update_screen():
   
     for i in range(12):
@@ -68,7 +95,8 @@ def update_screen():
                 draw_tower(peli.board.get_spot(i,j),50*j,50*i)
                 continue
        
-    draw_menu()     
+    draw_menu()   
+    draw_build()  
     
     pygame.display.flip()
     
@@ -81,7 +109,7 @@ def draw_lose_screen():
 def draw_tower(tower,x,y):
     ya=tower.shot_y(pygame.time.get_ticks())
     xa=tower.shot_x(pygame.time.get_ticks())
-    screen.blit(rotatecenter(torni,tower.angletoenemy(pygame.time.get_ticks())),(x,y))
+    screen.blit(rotatecenter(tower.pic,tower.angletoenemy(pygame.time.get_ticks())),(x,y))
     if(ya!=0 or xa!=0):
         pygame.draw.circle(screen,(1,0,0),(x+25+ya,y+25+xa),7,0)
     
@@ -179,46 +207,133 @@ def print_text():
     screen.blit(text,(20,675))
     screen.blit(text2,(20,650))
     screen.blit(text3,(20,625))
-
+    
+def draw_a_button(x,y,sizex,sizey,normal1,normal2,chosen1,chosen2,pic,name,boole):
+    pressed=False
+    a=(pygame.mouse.get_pos())
+    text=pygame.font.Font("mono.ttf",10).render(name,1,(10,10,10))
+    if(boole or (a[0]>x and a[0]<x+sizex and a[1]>y and a[1]<y+sizey and  pygame.mouse.get_pressed()==(1,0,0))):
+        pygame.draw.rect(screen,chosen1,(x,y,sizex,sizey),0)
+        pygame.draw.rect(screen,chosen2,(x,y,sizex,sizey),1)
+        pressed=True
+    else:
+        pygame.draw.rect(screen,normal1,(x,y,sizex,sizey),0)
+        pygame.draw.rect(screen,normal2,(x,y,sizex,sizey),1)
+    if (pic!=None):
+        screen.blit(pygame.transform.scale(pic,(30,30)),(x,y+5))
+        screen.blit(text,((x+40+(sizex-40)/2) - text.get_width()/2, (y+sizey/4) - text.get_height()/4))
+    else:
+        screen.blit(text,((x+(sizex)/2) - text.get_width()/2, (y+sizey/2) - text.get_height()/2))
+    return pressed
+   
+def draw_build():
+    if build:
+        global build1,build2,build3,build4
+        a=pygame.mouse.get_pos()
+        i=int(a[0]/50)
+        j=int(a[1]/50)
+        #print(str(a[0])+" "+str(a[1]))
+        if (build1 and a[1]<600):
+            if(isinstance(peli.board.get_spot(j, i),Road) or isinstance(peli.board.get_spot(j, i),Tower)):
+                screen.blit(denied,(i*50,j*50))
+            else:
+                screen.blit(torni,(i*50,j*50))
+                myrange=2
+                circle=pygame.Surface((50*myrange*2,50*myrange*2))
+                circle.fill((1,0,0))
+                circle.set_colorkey((1,0,0))
+                pygame.draw.circle(circle,(192,192,192),(50*myrange,50*myrange),50*myrange,0)
+                circle.set_alpha(25)
+                screen.blit(circle,((i+0.5)*50-myrange*50,(j+0.5)*50-myrange*50))
+                if(pygame.mouse.get_pressed()==(1,0,0)):
+                    add_tower(a, prices[1], powers[1], ranges[1], speeds[1],torni,name1)
+                    build1=False
+        if (build2 and a[1]<600):
+            if(isinstance(peli.board.get_spot(j, i),Road) or isinstance(peli.board.get_spot(j, i),Tower)):
+                screen.blit(denied,(i*50,j*50))
+            else:
+                screen.blit(torni2,(i*50,j*50))
+                myrange=3
+                circle=pygame.Surface((50*myrange*2,50*myrange*2))
+                circle.fill((1,0,0))
+                circle.set_colorkey((1,0,0))
+                pygame.draw.circle(circle,(192,192,192),(50*myrange,50*myrange),50*myrange,0)
+                circle.set_alpha(25)
+                screen.blit(circle,((i+0.5)*50-myrange*50,(j+0.5)*50-myrange*50))
+                if(pygame.mouse.get_pressed()==(1,0,0)):
+                    add_tower(a, prices[2], powers[2], ranges[2], speeds[2],torni2,name2)
+                    build2=False
+        if (build3 and a[1]<600):
+            if(isinstance(peli.board.get_spot(j, i),Road) or isinstance(peli.board.get_spot(j, i),Tower)):
+                screen.blit(denied,(i*50,j*50))
+            else:
+                screen.blit(torni3,(i*50,j*50))
+                myrange=5
+                circle=pygame.Surface((50*myrange*2,50*myrange*2))
+                circle.fill((1,0,0))
+                circle.set_colorkey((1,0,0))
+                pygame.draw.circle(circle,(192,192,192),(50*myrange,50*myrange),50*myrange,0)
+                circle.set_alpha(25)
+                screen.blit(circle,((i+0.5)*50-myrange*50,(j+0.5)*50-myrange*50))
+                if(pygame.mouse.get_pressed()==(1,0,0)):
+                    add_tower(a, prices[3], powers[3], ranges[3], speeds[3],torni3,name3)
+                    build3=False
+        if (build4 and a[1]<600):
+            if(isinstance(peli.board.get_spot(j, i),Road) or isinstance(peli.board.get_spot(j, i),Tower)):
+                screen.blit(denied,(i*50,j*50))
+            else:
+                screen.blit(torni4,(i*50,j*50))
+                myrange=7
+                circle=pygame.Surface((50*myrange*2,50*myrange*2))
+                circle.fill((1,0,0))
+                circle.set_colorkey((1,0,0))
+                pygame.draw.circle(circle,(192,192,192),(50*myrange,50*myrange),50*myrange,0)
+                circle.set_alpha(25)
+                screen.blit(circle,((i+0.5)*50-myrange*50,(j+0.5)*50-myrange*50))
+                if(pygame.mouse.get_pressed()==(1,0,0)):
+                    add_tower(a, prices[4], powers[4], ranges[4], speeds[4],torni4,name4)
+                    build4=False
+ 
 def print_buttons():
+    global build1,build2,build3,build4,build
     teksti=("Build")
     font=pygame.font.Font("mono.ttf",16)
     text=font.render(teksti,1,(10,10,10))
-    
     screen.blit(text,(firstx-70,firsty+space+6,buttonx,buttony))
     normal1=(200,191,200)
     normal2=(1,0,0)
     chosen1=(200,100,100)
     chosen2=(200,0,0)
-    a=(pygame.mouse.get_pos())
-    if(a[0]>firstx and a[0]<firstx+buttonx and a[1]>firsty+space+4  and a[1]<firsty+space+4+buttony ):
-        pygame.draw.rect(screen,chosen1,(firstx,firsty+space+4,buttonx,buttony),0)
-        pygame.draw.rect(screen,chosen2,(firstx,firsty+space+4,buttonx,buttony),1)
-    else:
-        pygame.draw.rect(screen,normal1,(firstx,firsty+space+4,buttonx,buttony),0)
-        pygame.draw.rect(screen,normal2,(firstx,firsty+space+4,buttonx,buttony),1)
-        
-    if(a[0]>firstx and a[0]<firstx+buttonx and a[1]>firsty+space+4+buttony+space  and a[1]<firsty+space+4+2*buttony+space ):
-        pygame.draw.rect(screen,chosen1,(firstx,firsty+space+4+buttony+space,buttonx,buttony),0)
-        pygame.draw.rect(screen,chosen2,(firstx,firsty+space+4+buttony+space,buttonx,buttony),1)
-    else:
-        pygame.draw.rect(screen,normal1,(firstx,firsty+space+4+buttony+space,buttonx,buttony),0)
-        pygame.draw.rect(screen,normal2,(firstx,firsty+space+4+buttony+space,buttonx,buttony),1)
+    if(draw_a_button(firstx-70,firsty+space+4,50,buttony,normal1,normal2,chosen1,chosen2,None,"Build",build)):
+        build=True
+    if(draw_a_button(firstx-70,firsty+space+4+buttony+space,50,buttony,normal1,normal2,chosen1,chosen2,None,"Cancel",False)):
+        build=False
+        build1=False
+        build2=False
+        build3=False
+        build4=False
+    if build:
+        if(draw_a_button(firstx,firsty+space+4,buttonx,buttony,normal1,normal2,chosen1,chosen2,torni,name1,build1)):
+            build1=True
+            build2=False
+            build3=False
+            build4=False
+        if(draw_a_button(firstx,firsty+space+4+buttony+space,buttonx,buttony,normal1,normal2,chosen1,chosen2,torni2,name2,build2)):
+            build1=False
+            build2=True
+            build3=False
+            build4=False
+        if(draw_a_button(firstx+buttonx+space,firsty+space+4,buttonx,buttony,normal1,normal2,chosen1,chosen2,torni3,name3,build3)):
+            build1=False
+            build2=False
+            build3=True
+            build4=False
+        if(draw_a_button(firstx+buttonx+space,firsty+space+4+buttony+space,buttonx,buttony,normal1,normal2,chosen1,chosen2,torni4,name4,build4)):
+            build1=False
+            build2=False
+            build3=False
+            build4=True
 
-    if(a[0]>firstx+buttonx+space and a[0]<firstx+2*buttonx+space and a[1]>firsty+space+4  and a[1]<firsty+space+4+buttony ):
-        pygame.draw.rect(screen,chosen1,(firstx+buttonx+space,firsty+space+4,buttonx,buttony),0)
-        pygame.draw.rect(screen,chosen2,(firstx+buttonx+space,firsty+space+4,buttonx,buttony),1)
-    else:
-        pygame.draw.rect(screen,normal1,(firstx+buttonx+space,firsty+space+4,buttonx,buttony),0)
-        pygame.draw.rect(screen,normal2,(firstx+buttonx+space,firsty+space+4,buttonx,buttony),1)
-
-    if(a[0]>firstx+buttonx+space and a[0]<firstx+2*buttonx+space and  a[1]>firsty+space+4+buttony+space  and a[1]<firsty+space+4+2*buttony+space ):
-        pygame.draw.rect(screen,chosen1,(firstx+buttonx+space,firsty+space+buttony+space+4,buttonx,buttony),0)
-        pygame.draw.rect(screen,chosen2,(firstx+buttonx+space,firsty+space+buttony+space+4,buttonx,buttony),1)
-    else:
-        pygame.draw.rect(screen,normal1,(firstx+buttonx+space,firsty+space+buttony+space+4,buttonx,buttony),0)
-        pygame.draw.rect(screen,normal2,(firstx+buttonx+space,firsty+space+buttony+space+4,buttonx,buttony),1)
-    
 def draw_menu():
     pygame.draw.rect(screen,color,(0,600,1000,100),0)
     pygame.draw.lines(screen, (1,0,0), False,[(0,600),(998,600),(998,698),(0,698),(0,600)],4)
@@ -249,7 +364,7 @@ def spawn_enemy(name,hp,speed,start):
     
     enemycount=enemycount+1
     
-def add_tower(a,price,power,myrange,speed):
+def add_tower(a,price,power,myrange,speed,pic,name):
     global towercount
     global money
     if not (isinstance(peli.board.get_spot(int(a[1]/50),int(a[0]/50)),Road)):
@@ -257,7 +372,7 @@ def add_tower(a,price,power,myrange,speed):
             if(money<price):
                 new_text("Not enough money")
             else:
-                new_text(peli.board.add_tower(int(a[1]/50), int(a[0]/50),price,power,myrange,towercount,speed,money))
+                new_text(peli.board.add_tower(int(a[1]/50), int(a[0]/50),price,power,myrange,towercount,speed,money,pic,name))
                 towers[towercount]=peli.board.get_spot(int(a[1]/50), int(a[0]/50))
                 money-=price
                 towercount+=1
@@ -316,7 +431,10 @@ make_road()
 clock=pygame.time.Clock()
     
 logo = pygame.image.load("logo32x32.png")
-torni=pygame.image.load("cannon2.png")
+torni=pygame.image.load("cannon.png")
+torni2=pygame.image.load("gatling.png")
+torni3=pygame.image.load("cannon3.png")
+torni4=pygame.image.load("sniper.png")
 boom=pygame.image.load("boom.png")
 boom_s=pygame.image.load("boom_small.png")
 tie=pygame.image.load("road.png")
@@ -324,6 +442,7 @@ tie_start=pygame.image.load("road_start.png")
 tie_goal=pygame.image.load("road_goal.png")
 maa=pygame.image.load("empty.png")
 bugu=pygame.image.load("tank_u.png")
+denied=pygame.image.load("denied.png")
 
 
 pygame.display.set_icon(logo)
@@ -354,9 +473,9 @@ running=True
 while running:
     time=pygame.time.get_ticks()/1000
     a=(pygame.mouse.get_pos())
-    if pygame.mouse.get_pressed()==(1,0,0):
-        if(a[1]<=600):
-            add_tower(a, 100, 10, 5, 10)
+    #if pygame.mouse.get_pressed()==(1,0,0):
+        #if(a[1]<=600):
+            #add_tower(a, 100, 10, 5, 10)
             #new_text(peli.board.add_tower(int(a[1]/50), int(a[0]/50),100,5,5))
     if pygame.mouse.get_pressed()==(0,0,1):
         if(a[1]<=600):
