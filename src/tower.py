@@ -42,12 +42,16 @@ class Tower(Spot):
         if(self.target!=None and self.distance(self.target)<=self.myrange):
             if (self.target.spot.x>self.target.spot.next.x):
                 xa=-self.target.get_frame()
+                ya=self.target.get_framey()
             if (self.target.spot.x<self.target.spot.next.x):
                 xa=self.target.get_frame()
+                ya=-self.target.get_framey()
             if (self.target.spot.y>self.target.spot.next.y):
                 ya=-self.target.get_frame()
+                xa=-self.target.get_framey()
             if (self.target.spot.y<self.target.spot.next.y):
                 ya=self.target.get_frame()
+                xa=self.target.get_framey()
             
             deltay=self.y-self.target.spot.y-ya/50
             deltax=self.x-self.target.spot.x-xa/50

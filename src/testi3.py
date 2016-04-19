@@ -77,8 +77,8 @@ def update_screen():
             if isinstance(peli.board.get_spot(i, j),Spot):
                 screen.blit(maa,(50*j,50*i))
     for i in range(enemycount):
-        if enemies[i]!=None:
-            if(draw_enemy(enemies[i])):
+        if enemies[enemycount-1-i]!=None:
+            if(draw_enemy(enemies[enemycount-1-i])):
                 pygame.time.wait(500)
                 new_text("You lose")
                 draw_lose_screen()
@@ -95,8 +95,9 @@ def update_screen():
                 draw_tower(peli.board.get_spot(i,j),50*j,50*i)
                 continue
        
+    draw_build()
     draw_menu()   
-    draw_build()  
+      
     
     pygame.display.flip()
     
@@ -115,17 +116,21 @@ def draw_tower(tower,x,y):
     
     if (tower.target!= None and tower.target.gotshot(pygame.time.get_ticks(),tower.timetotarget)):
             frame=tower.target.get_frame()
+            framey=tower.target.get_framey()
             xd=0
             yd=0
             if (tower.target.spot.x>tower.target.spot.next.x):
                 xd=-frame
+                yd=framey
             if (tower.target.spot.x<tower.target.spot.next.x):
                 xd=frame
+                yd=-framey
             if (tower.target.spot.y>tower.target.spot.next.y):
+                xd=-framey
                 yd=-frame
             if (tower.target.spot.y<tower.target.spot.next.y):
-                yd=frame
-            
+                yd=framey
+            xd=framey
             screen.blit(boom_s, (12+yd+tower.target.spot.y*50,12+xd+tower.target.spot.x*50))
     
 
@@ -142,20 +147,24 @@ def draw_enemy(enemy):
     ya=0
     xa=0
     frame=enemy.get_frame()
-    
+    framey=enemy.get_framey()
     if not (enemy.spot.goal):
         if (enemy.spot.x>enemy.spot.next.x):
             kuva=bugu
             xa=-frame
+            ya=framey
         if (enemy.spot.x<enemy.spot.next.x):
             kuva=rotatecenter(bugu,180)
             xa=frame
+            ya=-framey
         if (enemy.spot.y>enemy.spot.next.y):
             kuva=rotatecenter(bugu,90)
             ya=-frame
+            xa=-framey
         if (enemy.spot.y<enemy.spot.next.y):
             kuva=rotatecenter(bugu,270)
             ya=frame
+            xa=framey
         screen.blit(kuva,(ya+enemy.spot.y*50,xa+enemy.spot.x*50))
         
         draw_enemy_hp(enemy,ya,xa)
@@ -168,8 +177,8 @@ def draw_enemy(enemy):
                 if isinstance(peli.board.get_spot(i, j),Tower):
                     screen.blit(boom,(50*j,50*i))
         for i in range(enemycount):
-            if (enemies[i]!=None and enemies[i]!=enemy):
-                draw_enemy(enemies[i])
+            if (enemies[enemycount-1-i]!=None and enemies[enemycount-1-i]!=enemy):
+                draw_enemy(enemies[enemycount-1-i])
         screen.blit(kuva,(enemy.spot.y*50,enemy.spot.x*50))
         pygame.display.flip()
         lost=True
@@ -179,10 +188,12 @@ def draw_enemy_hp(enemy,ya,xa):
     percentage=enemy.get_relative_hp()
     green=40*percentage
     red=40-green
+
     if(green>0):
         pygame.draw.rect(screen,(0,200,0),(ya+enemy.spot.y*50+5,xa+enemy.spot.x*50+5,green,5),0)
     if(red>0 and red<=40):
         pygame.draw.rect(screen,(200,0,0),(ya+enemy.spot.y*50+5+green,xa+enemy.spot.x*50+5,red,5),0)
+    pygame.draw.rect(screen,(1,0,0),(ya+enemy.spot.y*50+5,xa+enemy.spot.x*50+5,40,5),1)
 
     
 def new_text(teksti):
@@ -225,7 +236,9 @@ def draw_a_button(x,y,sizex,sizey,normal1,normal2,chosen1,chosen2,pic,name,boole
     else:
         screen.blit(text,((x+(sizex)/2) - text.get_width()/2, (y+sizey/2) - text.get_height()/2))
     return pressed
-   
+
+        
+      
 def draw_build():
     if build:
         global build1,build2,build3,build4
@@ -340,7 +353,44 @@ def draw_menu():
     print_text()
     print_stats()
     print_buttons()
-    
+    draw_info()
+
+
+def draw_info():
+    if build and (build1 or build2 or build3 or build4):
+        if build1:
+            kuva=torni
+            name=name1
+            i=1
+        if build2:
+            kuva=torni2
+            name=name2
+            i=2
+        if build3:
+            kuva=torni3
+            name=name3
+            i=3
+        if build4:
+            kuva=torni4  
+            name=name4 
+            i=4
+        pygame.draw.rect(screen,(200,191,200),(firstx+2*buttonx+2*space,firsty+space+4,2*buttonx-space,2*buttony+space),0)
+        pygame.draw.rect(screen,(1,0,0),(firstx+2*buttonx+2*space,firsty+space+4,2*buttonx-space,2*buttony+space),1)
+        screen.blit(kuva,(firstx+2*buttonx+2*space+5,firsty+space+4+(2*buttony+space-50)/2))
+        text=pygame.font.Font("mono.ttf",18).render(name,1,(10,10,10))
+        screen.blit(text,((firstx+2*buttonx+2*space+50+(2*buttonx-space+5-50)/2) - text.get_width()/2, (firsty+space+8) ))
+        power=pygame.font.Font("mono.ttf",10).render("Power: "+str(powers[i]),1,(10,10,10))
+        speed=pygame.font.Font("mono.ttf",10).render("Speed: "+str(speeds[i]),1,(10,10,10))
+        myrange=pygame.font.Font("mono.ttf",10).render("Range: "+str(ranges[i]),1,(10,10,10))
+        price=pygame.font.Font("mono.ttf",10).render("Price: "+str(prices[i]),1,(10,10,10))
+        screen.blit(power,((firstx+2*buttonx+2*space+50+(2*buttonx-space+5-50)/4) - power.get_width()/2, (firsty+space+8+2*text.get_height()) ))
+        screen.blit(speed,((firstx+2*buttonx+2*space+50+(2*buttonx-space+5-50)/4) - speed.get_width()/2, (firsty+space+8+3*text.get_height()) ))
+        screen.blit(myrange,((firstx+2*buttonx+2*space+50+(2*buttonx-space+5-50)*3/4) - myrange.get_width()/2, (firsty+space+8+2*text.get_height()) ))
+        screen.blit(price,((firstx+2*buttonx+2*space+50+(2*buttonx-space+5-50)*3/4) - price.get_width()/2, (firsty+space+8+3*text.get_height()) ))
+
+        
+        
+        
 def make_road():
     global start
     for i in range(17):
@@ -480,7 +530,7 @@ while running:
     if pygame.mouse.get_pressed()==(0,0,1):
         if(a[1]<=600):
             remove_tower(a)
-            spawn_enemy("Baddie", 100, 10*randint(1,2), start)
+            spawn_enemy("Baddie", 100, randint(10,20), start)
     
     for event in pygame.event.get():
             # only do something if the event is of type QUIT

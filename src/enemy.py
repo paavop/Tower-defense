@@ -1,4 +1,4 @@
-
+from random import randint
 
 class Enemy(object):
     
@@ -11,6 +11,7 @@ class Enemy(object):
         self.speed=speed
         self.spot=spot
         self.anim_frame=0
+        self.anim_y=0
         self.timetonext=5/speed
         self.lastmove=0
         self.index=index
@@ -21,6 +22,8 @@ class Enemy(object):
         self.steps_taken=0
         self.price=(self.orig_hp+5*self.speed)/10
         
+    
+        return
     def move(self,prev):
         mynext=self.spot.get_next()
         self.spot=mynext
@@ -53,7 +56,15 @@ class Enemy(object):
         return False
     def get_frame(self):
         return self.anim_frame
-    
+    def get_framey(self):
+        if(self.hp>0):
+            self.add_y(randint(0,1)-0.5)
+        return self.anim_y
+    def add_y(self,x):
+        if (self.anim_y+x>10 or self.anim_y+x<-10):
+            x=-x
+        self.anim_y+=x
+        
     def add_frame(self,x,time):
         self.anim_frame=self.anim_frame+x
         self.lastmove=time
