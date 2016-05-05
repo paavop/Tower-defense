@@ -25,6 +25,7 @@ class Enemy(object):
         
     
         return
+    #Siirtää vihollisen seuraavaan ruutuun
     def move(self,prev):
         mynext=self.spot.get_next()
         self.spot=mynext
@@ -33,20 +34,22 @@ class Enemy(object):
         self.steps_taken+=1
         #print(self.name+" moved")
     
+    #Ottaa osumaa, menetetty hp jää odottamaan ruudun päivitystä
     def shot(self,hplost,time):
         if self.shott==0:
             self.shot_time=time
         self.shott+=hplost
-        
-        
         
     def is_alive(self):
         if (self.hp>0):
             return True
         else:
             return False
+        
     def get_speed(self):
         return self.speed
+    
+    #Tarkistaa ottamansa damagen, päivittää tietonsa
     def gotshot(self,time,totarget):
         if(-(self.shot_time-time/1000)>=totarget and self.shot_time>0 and self.shott>0):
             self.hp-=self.shott
@@ -55,6 +58,9 @@ class Enemy(object):
             self.shot_time=0
             return True
         return False
+    
+    #Alla olevat metodit saavat vihollisen liikkumaan sulavasti ruudusta 
+    #ruutuun sekä liikkumaan hieman satunnaisesti sivulta sivulle
     def get_frame(self):
         return self.anim_frame
     def get_framey(self):
@@ -64,12 +70,10 @@ class Enemy(object):
     def add_y(self,x):
         if (self.anim_y+x>10 or self.anim_y+x<-10):
             x=-x
-        self.anim_y+=x
-        
+        self.anim_y+=x  
     def add_frame(self,x,time):
         self.anim_frame=self.anim_frame+x
         self.lastmove=time
-    
     def framezero(self):
         self.anim_frame=0
         

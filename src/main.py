@@ -8,47 +8,7 @@ from random import randint
 import sys
 
 
-teksti1=""
-teksti2=""
-teksti3="" 
-color=(200,191,231)
-start=None
-enemies={}
-towers={}
-enemycount=0
-towercount=0
-time=0
-score=0
-money=100
-prev_time=0
-peli=Game()
-pygame.init()
-done=False
-lost=False
-buttonx=120
-buttony=37
-firstx=350
-firsty=600
-space=(100-2*buttony-8)/3
-build=False
-build1=False
-build2=False
-build3=False
-build4=False
-
-names={}
-ranges={}
-speeds={}
-powers={}
-prices={}
-tornit={}
-enemytypes={}
-enemypic={}
-wavedata={}
-wave=1
-lastwave1=0
-spawnfreq={}
-lastspawn={}
+#Ajetaan loopin joka kierroksella, synnyttää tarvittavat viholliset
 def spawn():
     global lastspawn,wave,lastwave1
     if(pygame.time.get_ticks()/1000>wave*60):
@@ -68,7 +28,8 @@ def spawn():
             if (pygame.time.get_ticks()/1000>nexti and pygame.time.get_ticks()/1000<wave*60-10):
                 lastspawn[key]=pygame.time.get_ticks()/1000
                 spawn_enemy(key)
-            
+
+#Määrittää vihollisten syntymisnopeuden wave-tietojen perusteella   
 def det_spawn_freq():
     global lastspawn
     if(wave in wavedata):
@@ -78,7 +39,8 @@ def det_spawn_freq():
             else:
                 spawnfreq[key]=49/int(wavedata[wave][key])
             lastspawn[key]=0
-    print(spawnfreq)
+            
+#Lataa tiedostosta wave-tiedot            
 def init_waves(file):
     try:
         global wavedata
@@ -109,6 +71,7 @@ def init_waves(file):
         print("wave data is not readable, loading defaults")
         init_enemies("wavedata_default.txt")
 
+#Lataa tiedostosta vihollisten tiedot
 def init_enemies(file):
     try:
         global enemytypes,enemypic
@@ -145,6 +108,8 @@ def init_enemies(file):
     except (ValueError,IndexError):
         print("Enemy data is not readable, loading defaults")
         init_enemies("enemydata_default.txt")
+        
+#Lataa tiedostosta neljän tornin tiedot
 def init_towers(file):
     try:
         global names, ranges, speeds, powers, prices, tornit
@@ -178,13 +143,15 @@ def init_towers(file):
         print("Tower data is not readable, loading defaults")
         init_towers("towerdata_default.txt")
     
+#tarkistaa onko string integer
 def isInteger(s):
     try:
         int(s)
         return True
     except ValueError:
         return False
-        
+
+#Suoritetaan loopin joka kierroksella, päivittää tornit, ammukset ja viholliset kentälle      
 def update_screen():
   
     for i in range(12):
@@ -226,6 +193,8 @@ def update_screen():
       
     
     pygame.display.flip()
+    
+#piirtää endgamessa TOP 10 -listan tiedostosta, ja tallentaa pelaajan sinne
 def scoreboard():
     global score
     score=int(score)
@@ -302,12 +271,14 @@ def scoreboard():
                 return
     return
 
+#piirtää "Hävisit"-ruudun
 def draw_lose_screen():
     s=pygame.Surface((1000,600))
     s.set_alpha(128)
     s.fill((176,0,0))
     screen.blit(s,(0,0))
 
+#Piirtää yksittäisen tornin, ja sen kulman viholliseen
 def draw_tower(tower,x,y):
     ya=tower.shot_y(pygame.time.get_ticks())
     xa=tower.shot_x(pygame.time.get_ticks())
@@ -328,16 +299,17 @@ def draw_tower(tower,x,y):
                 xd=frame
                 yd=-framey
             if (tower.target.spot.y>tower.target.spot.next.y):
+                
                 xd=-framey
                 yd=-frame
             if (tower.target.spot.y<tower.target.spot.next.y):
                 yd=frame
                 xd=framey
                 
-            xd=framey
+            
             screen.blit(boom_s, (12+yd+tower.target.spot.y*50,12+xd+tower.target.spot.x*50))
     
-
+#Kääntää kuvaa tietyn astemäärän pitäen keskipisteen paikallaan
 def rotatecenter(image,angle):    
     orig_rect = image.get_rect()
     rot_image = pygame.transform.rotate(image, angle)
@@ -346,6 +318,7 @@ def rotatecenter(image,angle):
     rot_image = rot_image.subsurface(rot_rect).copy()
     return rot_image
 
+#Piirtää vihollisen laudalle
 def draw_enemy(enemy):
     kuva=enemypic[enemy.pic_index]
     ya=0
@@ -380,14 +353,16 @@ def draw_enemy(enemy):
             for j in range(20):
                 if isinstance(peli.board.get_spot(i, j),Tower):
                     screen.blit(boom,(50*j,50*i))
-        for i in range(enemycount):
-            if (enemies[enemycount-1-i]!=None and enemies[enemycount-1-i]!=enemy):
-                draw_enemy(enemies[enemycount-1-i])
+        #for i in range(enemycount):
+            #if (enemies[enemycount-1-i]!=None and enemies[enemycount-1-i]!=enemy):
+                
+                #draw_enemy(enemies[enemycount-1-i])
         screen.blit(kuva,(enemy.spot.y*50,enemy.spot.x*50))
         pygame.display.flip()
         lost=True
         return True
-    
+  
+#Piirtää vihollisen ylle sen hp:n  
 def draw_enemy_hp(enemy,ya,xa):
     percentage=enemy.get_relative_hp()
     green=40*percentage
@@ -399,7 +374,7 @@ def draw_enemy_hp(enemy,ya,xa):
         pygame.draw.rect(screen,(200,0,0),(ya+enemy.spot.y*50+5+green,xa+enemy.spot.x*50+5,red,5),0)
     pygame.draw.rect(screen,(1,0,0),(ya+enemy.spot.y*50+5,xa+enemy.spot.x*50+5,40,5),1)
 
-    
+#Ottaa vastaan uuden tekstin infoboksiin ja nostaa muita ylöspäin  
 def new_text(teksti):
     if (teksti!=None):
         global teksti1
@@ -409,8 +384,7 @@ def new_text(teksti):
         teksti2=teksti1
         teksti1=teksti
 
-
-               
+#Printtaa infoboksien tekstit ruudulle     
 def print_text():
     
     pygame.draw.rect(screen,(200,191,200),(10,610,200,80),0)
@@ -422,7 +396,8 @@ def print_text():
     screen.blit(text,(20,675))
     screen.blit(text2,(20,650))
     screen.blit(text3,(20,625))
-    
+
+#Piirtää painikkeen kuvalla haluttuun paikkaan
 def draw_a_button(x,y,sizex,sizey,normal1,normal2,chosen1,chosen2,pic,name,boole):
     pressed=False
     a=(pygame.mouse.get_pos())
@@ -442,7 +417,7 @@ def draw_a_button(x,y,sizex,sizey,normal1,normal2,chosen1,chosen2,pic,name,boole
     return pressed
 
         
-      
+#Piirtää rakennettaessa ampumaetäisyyden ja tornin pelilaudalle
 def draw_build():
     if build:
         global build1,build2,build3,build4
@@ -455,7 +430,7 @@ def draw_build():
                 screen.blit(denied,(i*50,j*50))
             else:
                 screen.blit(tornit[1],(i*50,j*50))
-                myrange=2
+                myrange=ranges[1]
                 circle=pygame.Surface((50*myrange*2,50*myrange*2))
                 circle.fill((1,0,0))
                 circle.set_colorkey((1,0,0))
@@ -470,7 +445,7 @@ def draw_build():
                 screen.blit(denied,(i*50,j*50))
             else:
                 screen.blit(tornit[2],(i*50,j*50))
-                myrange=3
+                myrange=ranges[2]
                 circle=pygame.Surface((50*myrange*2,50*myrange*2))
                 circle.fill((1,0,0))
                 circle.set_colorkey((1,0,0))
@@ -485,7 +460,7 @@ def draw_build():
                 screen.blit(denied,(i*50,j*50))
             else:
                 screen.blit(tornit[3],(i*50,j*50))
-                myrange=5
+                myrange=ranges[3]
                 circle=pygame.Surface((50*myrange*2,50*myrange*2))
                 circle.fill((1,0,0))
                 circle.set_colorkey((1,0,0))
@@ -500,7 +475,7 @@ def draw_build():
                 screen.blit(denied,(i*50,j*50))
             else:
                 screen.blit(tornit[4],(i*50,j*50))
-                myrange=7
+                myrange=ranges[4]
                 circle=pygame.Surface((50*myrange*2,50*myrange*2))
                 circle.fill((1,0,0))
                 circle.set_colorkey((1,0,0))
@@ -510,7 +485,8 @@ def draw_build():
                 if(pygame.mouse.get_pressed()==(1,0,0)):
                     add_tower(a, prices[4], powers[4], ranges[4], speeds[4],tornit[4],names[4])
                     #build4=False
- 
+
+#Piirtää ruudulle rakennuspainikkeet 
 def print_buttons():
     global build1,build2,build3,build4,build
     teksti=("Build")
@@ -551,6 +527,7 @@ def print_buttons():
             build3=False
             build4=True
 
+#Piirtää alapalkin
 def draw_menu():
     pygame.draw.rect(screen,color,(0,600,1000,100),0)
     pygame.draw.lines(screen, (1,0,0), False,[(0,600),(998,600),(998,698),(0,698),(0,600)],4)
@@ -559,7 +536,7 @@ def draw_menu():
     print_buttons()
     draw_info()
 
-
+#Piirtää lisäinfon tornista rakennettaessa
 def draw_info():
     if build and (build1 or build2 or build3 or build4):
         if build1:
@@ -593,8 +570,7 @@ def draw_info():
         screen.blit(price,((firstx+2*buttonx+2*space+50+(2*buttonx-space+5-50)*3/4) - price.get_width()/2, (firsty+space+8+3*text.get_height()) ))
 
         
-        
-        
+#Luo tien pelilaudalle map-tiedostosta      
 def make_road():
     global start
     file=open('map.txt')
@@ -627,8 +603,7 @@ def make_road():
     file.close()
     
     
-    
-    
+#Luo tietyn vihollistyypin pelilaudalle
 def spawn_enemy(enemy_index):
     global enemycount,enemytypes
     
@@ -643,6 +618,8 @@ def add_tower(a,price,power,myrange,speed,pic,name):
         if not (isinstance(peli.board.get_spot(int(a[1]/50),int(a[0]/50)),Tower)):
             if(money<price):
                 new_text("Not enough money")
+            elif(peli.board.get_tower_ratio()>=1):
+                new_text("Tower limit reached")
             else:
                 new_text(peli.board.add_tower(int(a[1]/50), int(a[0]/50),price,power,myrange,towercount,speed,money,pic,name))
                 towers[towercount]=peli.board.get_spot(int(a[1]/50), int(a[0]/50))
@@ -654,7 +631,7 @@ def add_tower(a,price,power,myrange,speed,pic,name):
         new_text("Can't build on road")
 
     
-    
+#Poistaa tornin   
 def remove_tower(a):
     global towercount
     global money
@@ -663,30 +640,33 @@ def remove_tower(a):
         money+=int(0.5*(peli.board.get_spot(int(a[1]/50), int(a[0]/50)).price))
     new_text(peli.board.remove_tower(int(a[1]/50), int(a[0]/50)))
     
-    
-    
-          
+#Tulostaa lisätiedot infopalkin oikeaan kulmaan         
 def print_stats():
     #pygame.draw.rect(screen,color,(850,610,125,80),0)
-    teksti2="Time : "+str(int(time))
-    teksti="Money: "+str(int(money))
-    teksti3="Score: "+str(int(score))
-    teksti4="Wave : "+str(int(wave))
+    teksti2="Time  : "+str(int(time))
+    teksti="Money : "+str(int(money))
+    teksti3="Score : "+str(int(score))
+    teksti4="Wave  : "+str(int(wave))
+    teksti5="Towers: "+peli.board.get_towercount()
     font=pygame.font.Font("mono.ttf",12)
     text=font.render(teksti,1,(10,10,10))
     text2=font.render(teksti2,1,(10,10,10))
     text3=font.render(teksti3,1,(10,10,10))
     text4=font.render(teksti4,1,(10,10,10))
+    text5=font.render(teksti5,1,(10,10,10))
     screen.blit(text,(850,610))
     screen.blit(text2,(850,625))
     screen.blit(text3,(850,640))
     screen.blit(text4,(850,655))
-    
+    screen.blit(text5,(850,670))
+
+#Käy läpi tornit ja ampuu niillä jotka voivat ampua
 def shoot_towers():
     for i in towers:
         if ((pygame.time.get_ticks()/1000)-towers[i].lastshot>(2/towers[i].speed)):
             towers[i].shoot(enemies,pygame.time.get_ticks()/1000)
-            
+ 
+#Käy läpi viholliset ja liikuttaa niitä tarvittaessa           
 def move_enemies(enemies):
     global money,score
     for i in enemies:
@@ -704,6 +684,50 @@ def move_enemies(enemies):
                 money+=enemies[i].price
                 score+=enemies[i].price/10
                 enemies[i]=None
+                
+teksti1=""
+teksti2=""
+teksti3="" 
+color=(200,191,231)
+start=None
+enemies={}
+towers={}
+enemycount=0
+towercount=0
+time=0
+score=0
+money=100
+prev_time=0
+peli=Game()
+pygame.init()
+done=False
+lost=False
+buttonx=120
+buttony=37
+firstx=350
+firsty=600
+space=(100-2*buttony-8)/3
+build=False
+build1=False
+build2=False
+build3=False
+build4=False
+
+names={}
+ranges={}
+speeds={}
+powers={}
+prices={}
+tornit={}
+enemytypes={}
+enemypic={}
+wavedata={}
+wave=1
+lastwave1=0
+spawnfreq={}
+lastspawn={}
+
+
 make_road()
 init_towers('towerdata.txt')
 init_enemies('enemydata.txt')
@@ -761,7 +785,6 @@ while running2:
     if pygame.mouse.get_pressed()==(0,0,1):
         if(a[1]<=600):
             remove_tower(a)
-            #spawn_enemy(randint(1,4))
     
     for event in pygame.event.get():
             # only do something if the event is of type QUIT

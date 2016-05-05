@@ -33,7 +33,8 @@ class Tower(Spot):
         
     def __str__(self):
         return "tower"
-        
+    
+    #Laskee kulman viholliseen tietyllä ajanhetkellä
     def angletoenemy(self,time):
         xa=0
         ya=0
@@ -59,6 +60,7 @@ class Tower(Spot):
             self.lastangle= 180*math.atan2(deltay,deltax)/math.pi
         return self.lastangle
     
+    #Metodi hakee vihollisen tarkan frame-sijainnin ammusta varten
     def shot_x(self,time):
         x=0
         xd=0
@@ -70,6 +72,7 @@ class Tower(Spot):
             x=-50*(self.x-self.target.spot.x+xd)*((time/1000-self.lastshot)/self.timetotarget)            
         return int(x)
     
+    #Metodi hakee vihollisen tarkan frame-sijainnin ammusta varten   
     def shot_y(self,time):
         y=0
         yd=0
@@ -81,13 +84,14 @@ class Tower(Spot):
             y=-50*(self.y-self.target.spot.y+yd)*((time/1000-self.lastshot)/self.timetotarget)            
         return int(y)
     
-                    
+    #Laskee etäisyyden viholliseen                
     def distance(self,enemy):
         return math.sqrt(pow((self.x-enemy.spot.x),2)+pow((self.y-enemy.spot.y),2))
     
     def get_index(self):
         return self.index
     
+    #Käy läpi mahdolliset viholliset, ampuu
     def shoot(self,enemies,time):
         if (self.target!=None):
             if(enemies[self.target.get_index()]!=None):

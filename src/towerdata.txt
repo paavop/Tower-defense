@@ -10,15 +10,15 @@ Image: cannon.png
 Name: Gatling gun
 Range: 3
 Speed: 15
-Power: 10
-Price: 350
+Power: 5
+Price: 1000
 Image: gatling.png
 
 3
 Name: Super cannon
-Range: 4
-Speed: 5
-Power: 20
+Range: 3
+Speed: 3
+Power: 10
 Price: 150
 Image: cannon3.png
 
@@ -27,5 +27,5 @@ Name: Sniper
 Range: 8
 Speed: 1
 Power: 100
-Price: 300
+Price: 500
 Image: sniper.png
