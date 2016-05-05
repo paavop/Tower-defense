@@ -1,0 +1,31 @@
+1
+Name: Cannon
+Range: 2
+Speed: 3
+Power: 5
+Price: 50
+Image: cannon.png
+
+2
+Name: Gatling gun
+Range: 3
+Speed: 15
+Power: 10
+Price: 350
+Image: gatling.png
+
+3
+Name: Super cannon
+Range: 4
+Speed: 5
+Power: 20
+Price: 200
+Image: cannon3.png
+
+4
+Name: Sniper
+Range: 8
+Speed: 1
+Power: 100
+Price: 300
+Image: sniper.png

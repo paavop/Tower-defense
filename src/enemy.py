@@ -4,7 +4,7 @@ class Enemy(object):
     
 
 
-    def __init__(self, name, hp, speed,spot,index):
+    def __init__(self, name, hp, speed,spot,index,pic_index,time):
         self.name=name
         self.orig_hp=hp
         self.hp=hp
@@ -13,14 +13,15 @@ class Enemy(object):
         self.anim_frame=0
         self.anim_y=0
         self.timetonext=5/speed
-        self.lastmove=0
+        self.lastmove=time
         self.index=index
         self.shott=0
         self.shot_time=0
         self.hplost=False
         self.prev_time=0
         self.steps_taken=0
-        self.price=(self.orig_hp+5*self.speed)/10
+        self.price=(self.orig_hp+self.speed)/4
+        self.pic_index=pic_index
         
     
         return

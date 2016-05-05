@@ -1,0 +1,26 @@
+1
+Name: Bug
+Hp: 10
+Speed: 10
+Image: bug_u.png
+
+2
+Name: Bike
+Hp: 50
+Speed: 40
+Image: bike.png
+
+
+3
+Name: Car
+Hp: 100
+Speed: 15
+Image: car.png
+
+
+4
+Name: Tank
+Hp: 1000
+Speed: 5
+Image: tank_u.png
+

@@ -38,6 +38,7 @@ class Board(object):
         
     def add_road(self,x,y):
         self.board[x,y]=Road(x,y)
+        #print("Road added to  "+str(x)+" "+str(y))
         if self.lastroad==None:
             self.board[x,y].def_start()
         if self.lastroad:
